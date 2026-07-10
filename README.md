@@ -8,8 +8,9 @@ Website dịch vụ thi công trần nhựa nano tại Ninh Bình, Thanh Hoá, H
 ## Chạy local
 
 ```bash
+docker compose up -d          # Postgres local
 npm install
-npm run db:setup   # tạo DB SQLite + seed dữ liệu
+npm run db:setup              # prisma db push + seed
 npm run dev
 ```
 
@@ -19,11 +20,11 @@ npm run dev
 
 ## Tech stack
 
-Next.js 14 (App Router) · Prisma · SQLite (local) / PostgreSQL Supabase (production) · Cloudflare R2 (ảnh) · TipTap · JWT cookie auth
+Next.js 14 (App Router) · Prisma · PostgreSQL (Docker local / Supabase production) · Cloudflare R2 (ảnh) · TipTap · JWT cookie auth
 
 ## Biến môi trường
 
-Xem `.env.example`. Local dùng SQLite (`DATABASE_URL="file:./dev.db"`). Production: PostgreSQL (Supabase) + Cloudflare R2.
+Xem `.env.example`. Local: `docker compose` + `DATABASE_URL` Postgres. Production: Supabase + Cloudflare R2 trên Vercel.
 
 Khi chưa cấu hình R2, ảnh upload lưu tạm vào `public/uploads/` (chỉ phù hợp local).
 
