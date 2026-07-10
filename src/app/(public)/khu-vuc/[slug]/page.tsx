@@ -6,7 +6,7 @@ import { buildMetadata, getSiteSettings } from "@/lib/seo";
 import { parseImages } from "@/lib/images";
 import { locationImage } from "@/lib/placeholders";
 import { buildLocationServiceJsonLd } from "@/lib/jsonld";
-import { relatedBlogSlugsForLocation } from "@/lib/local-seo";
+import { relatedBlogSlugsForLocation, thiCongLabel } from "@/lib/local-seo";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ProseContent from "@/components/public/ProseContent";
 import ProjectGallery from "@/components/public/ProjectGallery";
@@ -174,7 +174,7 @@ export default async function LocationDetailPage({ params }: { params: { slug: s
                 shortDescription={
                   s.shortDescription
                     ? `${s.shortDescription} Thi công tại ${location.title}.`
-                    : `Thi công ${s.title} tại ${location.title}.`
+                    : thiCongLabel(s.title, ` tại ${location.title}.`)
                 }
                 images={parseImages(s.images)}
               />

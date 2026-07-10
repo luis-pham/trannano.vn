@@ -1,5 +1,12 @@
 /** Local SEO helpers — excerpts & related content maps */
 
+/** Tránh "Thi công Thi công ..." khi title đã bắt đầu bằng Thi công */
+export function thiCongLabel(title: string, suffix = "") {
+  const trimmed = title.trim();
+  const base = /^thi\s*công\b/i.test(trimmed) ? trimmed : `Thi công ${trimmed}`;
+  return suffix ? `${base}${suffix}` : base;
+}
+
 export const LOCATION_EXCERPTS: Record<string, string> = {
   "ninh-binh":
     "Nhận thi công tại TP Ninh Bình, Tam Điệp, Hoa Lư — trần nano chống ẩm, báo giá trong ngày.",

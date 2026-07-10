@@ -4,12 +4,12 @@ import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { buildMetadata, getSiteSettings, formatPrice } from "@/lib/seo";
 import { parseImages } from "@/lib/images";
-import { buildServiceJsonLd, buildFaqPageJsonLd } from "@/lib/jsonld";
+import { buildServiceJsonLd } from "@/lib/jsonld";
 import { serviceImage } from "@/lib/placeholders";
+import { thiCongLabel } from "@/lib/local-seo";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ProseContent from "@/components/public/ProseContent";
 import ImageGrid from "@/components/public/ImageGrid";
-import FaqAccordion from "@/components/public/FaqAccordion";
 import CtaSection from "@/components/public/CtaSection";
 import JsonLd from "@/components/public/JsonLd";
 import RelatedLinks from "@/components/public/RelatedLinks";
@@ -44,7 +44,6 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
         where: { slug: params.slug, published: true },
         include: {
           priceItems: { orderBy: { order: "asc" } },
-          faqs: { where: { published: true }, orderBy: { order: "asc" } },
         },
       }),
     null
@@ -52,16 +51,6 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
   if (!service) notFound();
 
   const settings = await getSiteSettings();
-  const fallbackFaqs = await safeQuery(
-    "dich-vu.faqs",
-    () =>
-      prisma.faq.findMany({
-        where: { published: true },
-        orderBy: { order: "asc" },
-        take: 5,
-      }),
-    []
-  );
   const locations = await safeQuery(
     "dich-vu.locations",
     () =>
@@ -77,27 +66,21 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
   const heroImg = serviceImage(service.slug, images);
   const galleryImages = images.length > 0
     ? images.map((src, i) => ({ src, alt: `${service.title} - ảnh ${i + 1}` }))
-    : [{ src: heroImg, alt: `Thi công ${service.title} - Trannano.vn` }];
-
-  const faqItems = service.faqs.length > 0 ? service.faqs : fallbackFaqs;
-  const faqSchema = buildFaqPageJsonLd(faqItems);
-
-  const jsonLdData = [
-    buildServiceJsonLd(
-      {
-        title: service.title,
-        slug: service.slug,
-        shortDescription: service.shortDescription,
-      },
-      settings.businessName,
-      settings.serviceAreas
-    ),
-    ...(faqSchema ? [faqSchema] : []),
-  ];
+    : [{ src: heroImg, alt: `${thiCongLabel(service.title)} - Trannano.vn` }];
 
   return (
     <>
-      <JsonLd data={jsonLdData} />
+      <JsonLd
+        data={buildServiceJsonLd(
+          {
+            title: service.title,
+            slug: service.slug,
+            shortDescription: service.shortDescription,
+          },
+          settings.businessName,
+          settings.serviceAreas
+        )}
+      />
 
       <div className="bg-brand py-12 text-white">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
@@ -120,7 +103,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
         <div className="relative mb-10 aspect-[21/9] overflow-hidden rounded-xl bg-surface-muted">
           <Image
             src={heroImg}
-            alt={`Thi công ${service.title} tại Ninh Bình, Thanh Hoá`}
+            alt={thiCongLabel(service.title, " tại Ninh Bình, Thanh Hoá")}
             fill
             priority
             sizes="100vw"
@@ -173,18 +156,9 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
           </div>
         )}
 
-        {faqItems.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900">Câu hỏi về {service.title}</h2>
-            <div className="mt-6 max-w-3xl">
-              <FaqAccordion items={faqItems} />
-            </div>
-          </div>
-        )}
-
         <RelatedLinks
           className="mt-12"
-          title={`Thi công ${service.title} tại`}
+          title={thiCongLabel(service.title, " tại")}
           items={locations.map((loc) => ({
             slug: loc.slug,
             title: `${service.title} tại ${loc.title}`,
