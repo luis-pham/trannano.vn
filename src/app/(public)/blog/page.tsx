@@ -5,8 +5,6 @@ import { buildMetadata } from "@/lib/seo";
 import { placeholderImage } from "@/lib/placeholders";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 
-export const revalidate = 3600;
-
 export async function generateMetadata() {
   return buildMetadata({
     path: "/blog",

@@ -12,16 +12,6 @@ import CtaSection from "@/components/public/CtaSection";
 import JsonLd from "@/components/public/JsonLd";
 import RelatedLinks from "@/components/public/RelatedLinks";
 
-export const revalidate = 3600;
-
-export async function generateStaticParams() {
-  const posts = await prisma.blogPost.findMany({
-    where: { published: true },
-    select: { slug: true },
-  });
-  return posts.map((p) => ({ slug: p.slug }));
-}
-
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const post = await prisma.blogPost.findFirst({
     where: { slug: params.slug, published: true },

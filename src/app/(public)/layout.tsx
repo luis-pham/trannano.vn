@@ -5,6 +5,9 @@ import JsonLd from "@/components/public/JsonLd";
 import { getSiteSettings } from "@/lib/seo";
 import { buildLocalBusinessJsonLd } from "@/lib/jsonld";
 
+/** Render at request time — tránh fail `next build` khi DB chưa sẵn sàng trên Vercel */
+export const dynamic = "force-dynamic";
+
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSiteSettings();
 

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Noto_Serif } from "next/font/google";
-import { getSiteSettings } from "@/lib/seo";
 import { BRAND_LOGO } from "@/lib/brand";
 import "./globals.css";
 
@@ -18,17 +17,16 @@ const notoSerif = Noto_Serif({
   display: "swap",
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSiteSettings();
-  return {
-    title: {
-      default: settings.defaultMetaTitle,
-      template: `%s | ${BRAND_LOGO}`,
-    },
-    description: settings.defaultMetaDescription,
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://trannano.vn"),
-  };
-}
+/** Metadata mặc định — không gọi DB lúc build (Vercel). Trang cụ thể override qua generateMetadata riêng. */
+export const metadata: Metadata = {
+  title: {
+    default: "Trannano.vn - Nội Thất Tài Đức | Chuyên Thi Công Trần Nano",
+    template: `%s | ${BRAND_LOGO}`,
+  },
+  description:
+    "Nội Thất Tài Đức (Trannano.vn) chuyên thi công trần nhựa nano, ốp tường nhựa, lát sàn nhựa giả gỗ tại Ninh Bình, Thanh Hoá, Hà Nam. Báo giá miễn phí tận nơi, bảo hành dài hạn.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://trannano.vn"),
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { getSiteUrl } from "@/lib/seo";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = getSiteUrl();
 
@@ -17,50 +19,55 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/blog`, changeFrequency: "weekly", priority: 0.7 },
   ];
 
-  const [services, locations, projects, posts] = await Promise.all([
-    prisma.service.findMany({
-      where: { published: true },
-      select: { slug: true, updatedAt: true },
-    }),
-    prisma.location.findMany({
-      where: { published: true },
-      select: { slug: true, updatedAt: true },
-    }),
-    prisma.project.findMany({
-      where: { published: true },
-      select: { slug: true, updatedAt: true },
-    }),
-    prisma.blogPost.findMany({
-      where: { published: true },
-      select: { slug: true, updatedAt: true },
-    }),
-  ]);
+  try {
+    const [services, locations, projects, posts] = await Promise.all([
+      prisma.service.findMany({
+        where: { published: true },
+        select: { slug: true, updatedAt: true },
+      }),
+      prisma.location.findMany({
+        where: { published: true },
+        select: { slug: true, updatedAt: true },
+      }),
+      prisma.project.findMany({
+        where: { published: true },
+        select: { slug: true, updatedAt: true },
+      }),
+      prisma.blogPost.findMany({
+        where: { published: true },
+        select: { slug: true, updatedAt: true },
+      }),
+    ]);
 
-  return [
-    ...staticPages,
-    ...services.map((s) => ({
-      url: `${base}/dich-vu/${s.slug}`,
-      lastModified: s.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.9,
-    })),
-    ...locations.map((l) => ({
-      url: `${base}/khu-vuc/${l.slug}`,
-      lastModified: l.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.9,
-    })),
-    ...projects.map((p) => ({
-      url: `${base}/du-an/${p.slug}`,
-      lastModified: p.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    })),
-    ...posts.map((b) => ({
-      url: `${base}/blog/${b.slug}`,
-      lastModified: b.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    })),
-  ];
+    return [
+      ...staticPages,
+      ...services.map((s) => ({
+        url: `${base}/dich-vu/${s.slug}`,
+        lastModified: s.updatedAt,
+        changeFrequency: "weekly" as const,
+        priority: 0.85,
+      })),
+      ...locations.map((l) => ({
+        url: `${base}/khu-vuc/${l.slug}`,
+        lastModified: l.updatedAt,
+        changeFrequency: "weekly" as const,
+        priority: 0.85,
+      })),
+      ...projects.map((p) => ({
+        url: `${base}/du-an/${p.slug}`,
+        lastModified: p.updatedAt,
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+      })),
+      ...posts.map((p) => ({
+        url: `${base}/blog/${p.slug}`,
+        lastModified: p.updatedAt,
+        changeFrequency: "monthly" as const,
+        priority: 0.65,
+      })),
+    ];
+  } catch (e) {
+    console.error("sitemap: database unavailable, returning static URLs only", e);
+    return staticPages;
+  }
 }

@@ -7,8 +7,6 @@ import Breadcrumbs from "@/components/public/Breadcrumbs";
 import LocationCard from "@/components/public/LocationCard";
 import CtaSection from "@/components/public/CtaSection";
 
-export const revalidate = 3600;
-
 export async function generateMetadata() {
   return buildMetadata({
     path: "/khu-vuc",

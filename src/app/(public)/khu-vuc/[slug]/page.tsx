@@ -15,16 +15,6 @@ import CtaSection from "@/components/public/CtaSection";
 import JsonLd from "@/components/public/JsonLd";
 import RelatedLinks from "@/components/public/RelatedLinks";
 
-export const revalidate = 3600;
-
-export async function generateStaticParams() {
-  const locations = await prisma.location.findMany({
-    where: { published: true },
-    select: { slug: true },
-  });
-  return locations.map((l) => ({ slug: l.slug }));
-}
-
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const location = await prisma.location.findFirst({
     where: { slug: params.slug, published: true },

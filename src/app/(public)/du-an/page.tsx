@@ -6,8 +6,6 @@ import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ProjectGallery from "@/components/public/ProjectGallery";
 import CtaSection from "@/components/public/CtaSection";
 
-export const revalidate = 3600;
-
 export async function generateMetadata() {
   return buildMetadata({
     path: "/du-an",

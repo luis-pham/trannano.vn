@@ -11,16 +11,6 @@ import ImageGrid from "@/components/public/ImageGrid";
 import CtaSection from "@/components/public/CtaSection";
 import RelatedLinks from "@/components/public/RelatedLinks";
 
-export const revalidate = 3600;
-
-export async function generateStaticParams() {
-  const projects = await prisma.project.findMany({
-    where: { published: true },
-    select: { slug: true },
-  });
-  return projects.map((p) => ({ slug: p.slug }));
-}
-
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const project = await prisma.project.findFirst({
     where: { slug: params.slug, published: true },
