@@ -5,8 +5,11 @@ import JsonLd from "@/components/public/JsonLd";
 import { getSiteSettings, getPublicNavData } from "@/lib/site-data";
 import { buildLocalBusinessJsonLd } from "@/lib/jsonld";
 
-/** Cache trang public 60s — sau seed, đợi tối đa 1 phút hoặc Redeploy */
-export const revalidate = 60;
+/**
+ * Luôn lấy data mới từ DB — tránh ISR/cache trang trống khi Vercel
+ * build lúc Supabase chưa seed hoặc DATABASE_URL sai.
+ */
+export const dynamic = "force-dynamic";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const [settings, nav] = await Promise.all([getSiteSettings(), getPublicNavData()]);

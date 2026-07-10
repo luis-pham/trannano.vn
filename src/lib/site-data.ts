@@ -1,5 +1,4 @@
 import { cache } from "react";
-import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
 export const DEFAULT_SETTINGS = {
@@ -19,7 +18,8 @@ export const DEFAULT_SETTINGS = {
   defaultOgImage: "/images/hero.jpg",
 };
 
-async function loadSiteSettings() {
+/** Deduped per request — không dùng unstable_cache để tránh cache rỗng khi DB lỗi tạm thời */
+export const getSiteSettings = cache(async () => {
   try {
     const existing = await prisma.siteSettings.findUnique({ where: { id: "singleton" } });
     if (existing) return existing;
@@ -27,12 +27,12 @@ async function loadSiteSettings() {
       data: { id: "singleton", defaultOgImage: "/images/hero.jpg" },
     });
   } catch (e) {
-    console.error("loadSiteSettings: database unavailable", e);
+    console.error("getSiteSettings: database unavailable", e);
     return DEFAULT_SETTINGS;
   }
-}
+});
 
-async function loadPublicNav() {
+export const getPublicNavData = cache(async () => {
   try {
     const [services, locations] = await Promise.all([
       prisma.service.findMany({
@@ -48,22 +48,7 @@ async function loadPublicNav() {
     ]);
     return { services, locations };
   } catch (e) {
-    console.error("loadPublicNav: database unavailable", e);
+    console.error("getPublicNavData: database unavailable", e);
     return { services: [], locations: [] };
   }
-}
-
-const cachedSettings = unstable_cache(loadSiteSettings, ["site-settings"], {
-  revalidate: 120,
-  tags: ["site-settings"],
 });
-
-const cachedNav = unstable_cache(loadPublicNav, ["public-nav"], {
-  revalidate: 120,
-  tags: ["services", "locations"],
-});
-
-/** Deduped per-request + cached across requests (2 phút) */
-export const getSiteSettings = cache(() => cachedSettings());
-
-export const getPublicNavData = cache(() => cachedNav());
