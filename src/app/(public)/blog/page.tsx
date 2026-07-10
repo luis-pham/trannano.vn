@@ -3,6 +3,7 @@ import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { buildMetadata } from "@/lib/seo";
 import { placeholderImage } from "@/lib/placeholders";
+import { safeQuery } from "@/lib/safe-query";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 
 export async function generateMetadata() {
@@ -15,10 +16,15 @@ export async function generateMetadata() {
 }
 
 export default async function BlogPage() {
-  const posts = await prisma.blogPost.findMany({
-    where: { published: true },
-    orderBy: { publishedAt: "desc" },
-  });
+  const posts = await safeQuery(
+    "blog.list",
+    () =>
+      prisma.blogPost.findMany({
+        where: { published: true },
+        orderBy: { publishedAt: "desc" },
+      }),
+    []
+  );
 
   return (
     <>
@@ -40,7 +46,9 @@ export default async function BlogPage() {
 
       <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
         {posts.length === 0 ? (
-          <p className="text-center text-gray-500">Chưa có bài viết nào.</p>
+          <p className="text-center text-gray-500">
+            Chưa có bài viết nào. Nếu bạn là admin, kiểm tra kết nối database và chạy seed.
+          </p>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((post) => {

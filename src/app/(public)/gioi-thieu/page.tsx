@@ -1,12 +1,17 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { buildMetadata } from "@/lib/seo";
+import { safeQuery } from "@/lib/safe-query";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ProseContent from "@/components/public/ProseContent";
 import CtaSection from "@/components/public/CtaSection";
 
 export async function generateMetadata() {
-  const page = await prisma.page.findUnique({ where: { slug: "gioi-thieu" } });
+  const page = await safeQuery(
+    "gioi-thieu.meta",
+    () => prisma.page.findUnique({ where: { slug: "gioi-thieu" } }),
+    null
+  );
   if (!page) return {};
   return buildMetadata({
     title: page.metaTitle,
@@ -18,7 +23,11 @@ export async function generateMetadata() {
 }
 
 export default async function GioiThieuPage() {
-  const page = await prisma.page.findUnique({ where: { slug: "gioi-thieu" } });
+  const page = await safeQuery(
+    "gioi-thieu.page",
+    () => prisma.page.findUnique({ where: { slug: "gioi-thieu" } }),
+    null
+  );
   if (!page) notFound();
 
   return (

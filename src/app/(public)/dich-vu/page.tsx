@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { buildMetadata, getSiteSettings } from "@/lib/seo";
 import { parseImages } from "@/lib/images";
 import { buildServiceItemListJsonLd } from "@/lib/jsonld";
+import { safeQuery } from "@/lib/safe-query";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ServiceCard from "@/components/public/ServiceCard";
 import CtaSection from "@/components/public/CtaSection";
@@ -18,18 +19,26 @@ export async function generateMetadata() {
 }
 
 export default async function DichVuPage() {
-  const [services, settings, locations] = await Promise.all([
-    prisma.service.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-    }),
-    getSiteSettings(),
-    prisma.location.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-      select: { slug: true, title: true },
-    }),
-  ]);
+  const settings = await getSiteSettings();
+  const services = await safeQuery(
+    "dich-vu.list",
+    () =>
+      prisma.service.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      }),
+    []
+  );
+  const locations = await safeQuery(
+    "dich-vu.locations",
+    () =>
+      prisma.location.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+        select: { slug: true, title: true },
+      }),
+    []
+  );
 
   return (
     <>

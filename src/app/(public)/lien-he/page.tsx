@@ -1,12 +1,17 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { buildMetadata, getSiteSettings, toMapEmbedUrl } from "@/lib/seo";
+import { safeQuery } from "@/lib/safe-query";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ProseContent from "@/components/public/ProseContent";
 import ContactForm from "@/components/public/ContactForm";
 
 export async function generateMetadata() {
-  const page = await prisma.page.findUnique({ where: { slug: "lien-he" } });
+  const page = await safeQuery(
+    "lien-he.meta",
+    () => prisma.page.findUnique({ where: { slug: "lien-he" } }),
+    null
+  );
   if (!page) return {};
   return buildMetadata({
     title: page.metaTitle,
@@ -18,12 +23,14 @@ export async function generateMetadata() {
 }
 
 export default async function LienHePage() {
-  const [page, settings] = await Promise.all([
-    prisma.page.findUnique({ where: { slug: "lien-he" } }),
-    getSiteSettings(),
-  ]);
+  const page = await safeQuery(
+    "lien-he.page",
+    () => prisma.page.findUnique({ where: { slug: "lien-he" } }),
+    null
+  );
   if (!page) notFound();
 
+  const settings = await getSiteSettings();
   const mapSrc = toMapEmbedUrl(settings.mapEmbedUrl);
 
   return (

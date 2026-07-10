@@ -10,11 +10,17 @@ import ProseContent from "@/components/public/ProseContent";
 import ImageGrid from "@/components/public/ImageGrid";
 import CtaSection from "@/components/public/CtaSection";
 import RelatedLinks from "@/components/public/RelatedLinks";
+import { safeQuery } from "@/lib/safe-query";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const project = await prisma.project.findFirst({
-    where: { slug: params.slug, published: true },
-  });
+  const project = await safeQuery(
+    "du-an.meta",
+    () =>
+      prisma.project.findFirst({
+        where: { slug: params.slug, published: true },
+      }),
+    null
+  );
   if (!project) return {};
   const images = parseImages(project.images);
   return buildMetadata({
@@ -27,20 +33,28 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function ProjectDetailPage({ params }: { params: { slug: string } }) {
-  const [project, services] = await Promise.all([
-    prisma.project.findFirst({
-      where: { slug: params.slug, published: true },
-      include: { location: { select: { title: true, slug: true } } },
-    }),
-    prisma.service.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-      take: 3,
-      select: { slug: true, title: true },
-    }),
-  ]);
-
+  const project = await safeQuery(
+    "du-an.detail",
+    () =>
+      prisma.project.findFirst({
+        where: { slug: params.slug, published: true },
+        include: { location: { select: { title: true, slug: true } } },
+      }),
+    null
+  );
   if (!project) notFound();
+
+  const services = await safeQuery(
+    "du-an.services",
+    () =>
+      prisma.service.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+        take: 3,
+        select: { slug: true, title: true },
+      }),
+    []
+  );
 
   const images = parseImages(project.images);
   const heroImg = projectImage(project.slug, images);

@@ -6,6 +6,7 @@ import Breadcrumbs from "@/components/public/Breadcrumbs";
 import FaqAccordion from "@/components/public/FaqAccordion";
 import CtaSection from "@/components/public/CtaSection";
 import JsonLd from "@/components/public/JsonLd";
+import { safeQuery } from "@/lib/safe-query";
 
 export async function generateMetadata() {
   return buildMetadata({
@@ -17,10 +18,15 @@ export async function generateMetadata() {
 }
 
 export default async function FaqPage() {
-  const faqs = await prisma.faq.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-  });
+  const faqs = await safeQuery(
+    "faq.list",
+    () =>
+      prisma.faq.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      }),
+    []
+  );
 
   const faqSchema = buildFaqPageJsonLd(faqs);
 

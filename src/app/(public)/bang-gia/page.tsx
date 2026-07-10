@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { buildMetadata, formatPrice } from "@/lib/seo";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import CtaSection from "@/components/public/CtaSection";
+import { safeQuery } from "@/lib/safe-query";
 
 export async function generateMetadata() {
   return buildMetadata({
@@ -14,18 +15,28 @@ export async function generateMetadata() {
 }
 
 export default async function BangGiaPage() {
-  const services = await prisma.service.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-    include: {
-      priceItems: { orderBy: { order: "asc" } },
-    },
-  });
+  const services = await safeQuery(
+    "bang-gia.services",
+    () =>
+      prisma.service.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+        include: {
+          priceItems: { orderBy: { order: "asc" } },
+        },
+      }),
+    []
+  );
 
-  const orphanPrices = await prisma.priceItem.findMany({
-    where: { serviceId: null },
-    orderBy: { order: "asc" },
-  });
+  const orphanPrices = await safeQuery(
+    "bang-gia.orphan",
+    () =>
+      prisma.priceItem.findMany({
+        where: { serviceId: null },
+        orderBy: { order: "asc" },
+      }),
+    []
+  );
 
   return (
     <>

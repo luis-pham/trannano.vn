@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { buildMetadata } from "@/lib/seo";
 import { parseImages } from "@/lib/images";
 import { LOCATION_EXCERPTS } from "@/lib/local-seo";
+import { safeQuery } from "@/lib/safe-query";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import LocationCard from "@/components/public/LocationCard";
 import CtaSection from "@/components/public/CtaSection";
@@ -17,10 +18,15 @@ export async function generateMetadata() {
 }
 
 export default async function KhuVucIndexPage() {
-  const locations = await prisma.location.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-  });
+  const locations = await safeQuery(
+    "khu-vuc.list",
+    () =>
+      prisma.location.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      }),
+    []
+  );
 
   return (
     <>

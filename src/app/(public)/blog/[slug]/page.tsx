@@ -6,6 +6,7 @@ import { buildMetadata, getSiteSettings } from "@/lib/seo";
 import { placeholderImage } from "@/lib/placeholders";
 import { buildBlogPostingJsonLd } from "@/lib/jsonld";
 import { relatedForBlog } from "@/lib/local-seo";
+import { safeQuery } from "@/lib/safe-query";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ProseContent from "@/components/public/ProseContent";
 import CtaSection from "@/components/public/CtaSection";
@@ -13,9 +14,14 @@ import JsonLd from "@/components/public/JsonLd";
 import RelatedLinks from "@/components/public/RelatedLinks";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = await prisma.blogPost.findFirst({
-    where: { slug: params.slug, published: true },
-  });
+  const post = await safeQuery(
+    "blog.meta",
+    () =>
+      prisma.blogPost.findFirst({
+        where: { slug: params.slug, published: true },
+      }),
+    null
+  );
   if (!post) return {};
   return buildMetadata({
     title: post.metaTitle,
@@ -30,23 +36,36 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
   const related = relatedForBlog(params.slug);
 
-  const [post, settings, services, locations] = await Promise.all([
-    prisma.blogPost.findFirst({
-      where: { slug: params.slug, published: true },
-    }),
-    getSiteSettings(),
-    prisma.service.findMany({
-      where: { published: true, slug: { in: related.services } },
-      select: { slug: true, title: true },
-    }),
-    prisma.location.findMany({
-      where: { published: true, slug: { in: related.locations } },
-      select: { slug: true, title: true },
-      orderBy: { order: "asc" },
-    }),
-  ]);
-
+  const post = await safeQuery(
+    "blog.detail",
+    () =>
+      prisma.blogPost.findFirst({
+        where: { slug: params.slug, published: true },
+      }),
+    null
+  );
   if (!post) notFound();
+
+  const settings = await getSiteSettings();
+  const services = await safeQuery(
+    "blog.relatedServices",
+    () =>
+      prisma.service.findMany({
+        where: { published: true, slug: { in: related.services } },
+        select: { slug: true, title: true },
+      }),
+    []
+  );
+  const locations = await safeQuery(
+    "blog.relatedLocations",
+    () =>
+      prisma.location.findMany({
+        where: { published: true, slug: { in: related.locations } },
+        select: { slug: true, title: true },
+        orderBy: { order: "asc" },
+      }),
+    []
+  );
 
   const cover =
     post.coverImage || placeholderImage(`trannano-blog-${post.slug}`, 1200, 600);

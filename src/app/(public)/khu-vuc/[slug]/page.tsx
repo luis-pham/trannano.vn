@@ -14,11 +14,17 @@ import ServiceCard from "@/components/public/ServiceCard";
 import CtaSection from "@/components/public/CtaSection";
 import JsonLd from "@/components/public/JsonLd";
 import RelatedLinks from "@/components/public/RelatedLinks";
+import { safeQuery } from "@/lib/safe-query";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const location = await prisma.location.findFirst({
-    where: { slug: params.slug, published: true },
-  });
+  const location = await safeQuery(
+    "khu-vuc.meta",
+    () =>
+      prisma.location.findFirst({
+        where: { slug: params.slug, published: true },
+      }),
+    null
+  );
   if (!location) return {};
   const images = parseImages(location.images);
   return buildMetadata({
@@ -32,39 +38,57 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function LocationDetailPage({ params }: { params: { slug: string } }) {
-  const location = await prisma.location.findFirst({
-    where: { slug: params.slug, published: true },
-    include: {
-      projects: {
-        where: { published: true },
-        orderBy: { createdAt: "desc" },
-      },
-    },
-  });
+  const location = await safeQuery(
+    "khu-vuc.detail",
+    () =>
+      prisma.location.findFirst({
+        where: { slug: params.slug, published: true },
+        include: {
+          projects: {
+            where: { published: true },
+            orderBy: { createdAt: "desc" },
+          },
+        },
+      }),
+    null
+  );
 
   if (!location) notFound();
 
   const relatedBlogSlugs = relatedBlogSlugsForLocation(location.slug);
 
-  const [services, settings, otherLocations, relatedPosts] = await Promise.all([
-    prisma.service.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-    }),
-    getSiteSettings(),
-    prisma.location.findMany({
-      where: { published: true, NOT: { id: location.id } },
-      orderBy: { order: "asc" },
-      select: { slug: true, title: true },
-    }),
-    relatedBlogSlugs.length > 0
-      ? prisma.blogPost.findMany({
-          where: { published: true, slug: { in: relatedBlogSlugs } },
-          select: { slug: true, title: true },
-          take: 4,
-        })
-      : Promise.resolve([]),
-  ]);
+  const settings = await getSiteSettings();
+  const services = await safeQuery(
+    "khu-vuc.services",
+    () =>
+      prisma.service.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      }),
+    []
+  );
+  const otherLocations = await safeQuery(
+    "khu-vuc.others",
+    () =>
+      prisma.location.findMany({
+        where: { published: true, NOT: { id: location.id } },
+        orderBy: { order: "asc" },
+        select: { slug: true, title: true },
+      }),
+    []
+  );
+  const relatedPosts = await safeQuery(
+    "khu-vuc.blogs",
+    () =>
+      relatedBlogSlugs.length > 0
+        ? prisma.blogPost.findMany({
+            where: { published: true, slug: { in: relatedBlogSlugs } },
+            select: { slug: true, title: true },
+            take: 4,
+          })
+        : Promise.resolve([]),
+    []
+  );
 
   const images = parseImages(location.images);
   const heroImg = locationImage(location.slug, images);

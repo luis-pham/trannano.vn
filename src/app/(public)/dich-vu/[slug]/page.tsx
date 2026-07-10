@@ -13,11 +13,17 @@ import FaqAccordion from "@/components/public/FaqAccordion";
 import CtaSection from "@/components/public/CtaSection";
 import JsonLd from "@/components/public/JsonLd";
 import RelatedLinks from "@/components/public/RelatedLinks";
+import { safeQuery } from "@/lib/safe-query";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const service = await prisma.service.findFirst({
-    where: { slug: params.slug, published: true },
-  });
+  const service = await safeQuery(
+    "dich-vu.meta",
+    () =>
+      prisma.service.findFirst({
+        where: { slug: params.slug, published: true },
+      }),
+    null
+  );
   if (!service) return {};
   const images = parseImages(service.images);
   return buildMetadata({
@@ -31,28 +37,41 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function ServiceDetailPage({ params }: { params: { slug: string } }) {
-  const [service, settings, fallbackFaqs, locations] = await Promise.all([
-    prisma.service.findFirst({
-      where: { slug: params.slug, published: true },
-      include: {
-        priceItems: { orderBy: { order: "asc" } },
-        faqs: { where: { published: true }, orderBy: { order: "asc" } },
-      },
-    }),
-    getSiteSettings(),
-    prisma.faq.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-      take: 5,
-    }),
-    prisma.location.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-      select: { slug: true, title: true },
-    }),
-  ]);
-
+  const service = await safeQuery(
+    "dich-vu.detail",
+    () =>
+      prisma.service.findFirst({
+        where: { slug: params.slug, published: true },
+        include: {
+          priceItems: { orderBy: { order: "asc" } },
+          faqs: { where: { published: true }, orderBy: { order: "asc" } },
+        },
+      }),
+    null
+  );
   if (!service) notFound();
+
+  const settings = await getSiteSettings();
+  const fallbackFaqs = await safeQuery(
+    "dich-vu.faqs",
+    () =>
+      prisma.faq.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+        take: 5,
+      }),
+    []
+  );
+  const locations = await safeQuery(
+    "dich-vu.locations",
+    () =>
+      prisma.location.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+        select: { slug: true, title: true },
+      }),
+    []
+  );
 
   const images = parseImages(service.images);
   const heroImg = serviceImage(service.slug, images);

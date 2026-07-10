@@ -5,6 +5,7 @@ import { parseImages } from "@/lib/images";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ProjectGallery from "@/components/public/ProjectGallery";
 import CtaSection from "@/components/public/CtaSection";
+import { safeQuery } from "@/lib/safe-query";
 
 export async function generateMetadata() {
   return buildMetadata({
@@ -22,24 +23,34 @@ export default async function DuAnPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const locations = await prisma.location.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-    select: { id: true, slug: true, title: true },
-  });
+  const locations = await safeQuery(
+    "du-an.locations",
+    () =>
+      prisma.location.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+        select: { id: true, slug: true, title: true },
+      }),
+    []
+  );
 
   const locationFilter = searchParams.location
     ? locations.find((l) => l.slug === searchParams.location)
     : null;
 
-  const projects = await prisma.project.findMany({
-    where: {
-      published: true,
-      ...(locationFilter ? { locationId: locationFilter.id } : {}),
-    },
-    orderBy: { createdAt: "desc" },
-    include: { location: { select: { title: true } } },
-  });
+  const projects = await safeQuery(
+    "du-an.list",
+    () =>
+      prisma.project.findMany({
+        where: {
+          published: true,
+          ...(locationFilter ? { locationId: locationFilter.id } : {}),
+        },
+        orderBy: { createdAt: "desc" },
+        include: { location: { select: { title: true } } },
+      }),
+    []
+  );
 
   const projectItems = projects.map((p) => ({
     slug: p.slug,
