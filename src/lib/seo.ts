@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { prisma } from "./prisma";
 import { BRAND_LOGO } from "./brand";
+import { getSiteSettings } from "./site-data";
+
+export { getSiteSettings } from "./site-data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://trannano.vn";
 
@@ -15,39 +17,6 @@ export function absoluteUrl(pathOrUrl?: string | null): string | undefined {
   if (value.startsWith("http://") || value.startsWith("https://")) return value;
   const base = getSiteUrl();
   return `${base}${value.startsWith("/") ? value : `/${value}`}`;
-}
-
-const DEFAULT_SETTINGS = {
-  id: "singleton",
-  businessName: "Nội Thất Tài Đức",
-  phone: "0986.979.353",
-  zaloUrl: null as string | null,
-  address: null as string | null,
-  workingHours: "Nhận điện thoại 24/7",
-  serviceAreas: "Ninh Bình, Thanh Hoá, Hà Nam",
-  mapEmbedUrl: null as string | null,
-  facebookUrl: null as string | null,
-  googleBusinessUrl: null as string | null,
-  defaultMetaTitle: "Trannano.vn - Nội Thất Tài Đức | Chuyên Thi Công Trần Nano",
-  defaultMetaDescription:
-    "Nội Thất Tài Đức (Trannano.vn) chuyên thi công trần nhựa nano, ốp tường nhựa, lát sàn nhựa giả gỗ tại Ninh Bình, Thanh Hoá, Hà Nam. Báo giá miễn phí tận nơi, bảo hành dài hạn.",
-  defaultOgImage: "/images/hero.jpg",
-};
-
-export async function getSiteSettings() {
-  try {
-    return await prisma.siteSettings.upsert({
-      where: { id: "singleton" },
-      update: {},
-      create: {
-        id: "singleton",
-        defaultOgImage: "/images/hero.jpg",
-      },
-    });
-  } catch (e) {
-    console.error("getSiteSettings: database unavailable, using defaults", e);
-    return DEFAULT_SETTINGS;
-  }
 }
 
 function withBrandSuffix(title: string) {

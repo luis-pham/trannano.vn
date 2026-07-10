@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { serviceSchema } from "@/lib/validators";
 import { uniqueSlug } from "@/lib/slugify";
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    revalidateTag("services");
     revalidatePath("/");
     revalidatePath("/dich-vu");
     revalidatePath(`/dich-vu/${item.slug}`);

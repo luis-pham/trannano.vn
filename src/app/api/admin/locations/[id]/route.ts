@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { locationSchema } from "@/lib/validators";
 import { uniqueSlug } from "@/lib/slugify";
@@ -53,6 +53,7 @@ export async function PUT(request: NextRequest, { params }: Ctx) {
       },
     });
 
+    revalidateTag("locations");
     revalidatePath("/");
     revalidatePath(`/khu-vuc/${existing.slug}`);
     revalidatePath(`/khu-vuc/${item.slug}`);
@@ -67,6 +68,7 @@ export async function DELETE(_req: NextRequest, { params }: Ctx) {
   const existing = await prisma.location.findUnique({ where: { id: params.id } });
   if (!existing) return jsonError("Không tìm thấy", 404);
   await prisma.location.delete({ where: { id: params.id } });
+  revalidateTag("locations");
   revalidatePath("/");
   revalidatePath(`/khu-vuc/${existing.slug}`);
   return NextResponse.json({ ok: true });

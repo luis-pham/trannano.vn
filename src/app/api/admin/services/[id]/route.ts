@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { serviceSchema } from "@/lib/validators";
 import { uniqueSlug } from "@/lib/slugify";
@@ -55,6 +55,7 @@ export async function PUT(request: NextRequest, { params }: Ctx) {
       },
     });
 
+    revalidateTag("services");
     revalidatePath("/");
     revalidatePath("/dich-vu");
     revalidatePath(`/dich-vu/${existing.slug}`);
@@ -70,6 +71,7 @@ export async function DELETE(_req: NextRequest, { params }: Ctx) {
   const existing = await prisma.service.findUnique({ where: { id: params.id } });
   if (!existing) return jsonError("Không tìm thấy", 404);
   await prisma.service.delete({ where: { id: params.id } });
+  revalidateTag("services");
   revalidatePath("/");
   revalidatePath("/dich-vu");
   revalidatePath(`/dich-vu/${existing.slug}`);

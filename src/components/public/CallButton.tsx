@@ -1,12 +1,15 @@
-import { getSiteSettings, phoneTel, zaloLink } from "@/lib/seo";
+import { phoneTel, zaloLink } from "@/lib/seo";
 
-export default async function CallButton() {
-  const settings = await getSiteSettings();
+type CallButtonProps = {
+  phone: string;
+  zaloUrl?: string | null;
+};
 
+export default function CallButton({ phone, zaloUrl }: CallButtonProps) {
   return (
     <div className="call-button-fixed flex gap-2">
       <a
-        href={phoneTel(settings.phone)}
+        href={phoneTel(phone)}
         className="flex items-center gap-2 rounded-full bg-accent px-4 py-3 text-sm font-semibold text-brand shadow-lg shadow-black/15 transition-colors hover:bg-accent-light active:scale-[0.98]"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -15,7 +18,7 @@ export default async function CallButton() {
         Gọi ngay
       </a>
       <a
-        href={zaloLink(settings.phone, settings.zaloUrl)}
+        href={zaloLink(phone, zaloUrl)}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-2 rounded-full bg-brand px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-black/15 transition-colors hover:bg-brand-dark active:scale-[0.98]"

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { settingsSchema } from "@/lib/validators";
 import { jsonError, zodError, nullIfEmpty } from "@/lib/api";
@@ -56,6 +56,7 @@ export async function PUT(request: NextRequest) {
       },
     });
 
+    revalidateTag("site-settings");
     revalidatePath("/", "layout");
     return NextResponse.json(item);
   } catch (e) {

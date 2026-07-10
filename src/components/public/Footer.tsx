@@ -1,21 +1,22 @@
 import Link from "next/link";
-import { getSiteSettings, phoneTel, zaloLink } from "@/lib/seo";
+import { phoneTel, zaloLink } from "@/lib/seo";
 import { BRAND_LOGO, BRAND_TAGLINE, COMPANY_NAME } from "@/lib/brand";
-import { prisma } from "@/lib/prisma";
 
-export default async function Footer() {
-  const settings = await getSiteSettings();
-  let locations: { slug: string; title: string }[] = [];
-  try {
-    locations = await prisma.location.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-      select: { slug: true, title: true },
-    });
-  } catch (e) {
-    console.error("Footer: database unavailable", e);
-  }
+type FooterSettings = {
+  phone: string;
+  address?: string | null;
+  workingHours: string;
+  facebookUrl?: string | null;
+  googleBusinessUrl?: string | null;
+  zaloUrl?: string | null;
+};
 
+type FooterProps = {
+  settings: FooterSettings;
+  locations: { slug: string; title: string }[];
+};
+
+export default function Footer({ settings, locations }: FooterProps) {
   const footerLinks = [
     { href: "/", label: "Trang chủ" },
     { href: "/gioi-thieu", label: "Giới thiệu" },
