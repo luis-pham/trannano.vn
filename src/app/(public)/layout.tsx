@@ -5,8 +5,8 @@ import JsonLd from "@/components/public/JsonLd";
 import { getSiteSettings, getPublicNavData } from "@/lib/site-data";
 import { buildLocalBusinessJsonLd } from "@/lib/jsonld";
 
-/** Cache trang public 2 phút — nhanh hơn force-dynamic mỗi request */
-export const revalidate = 120;
+/** Cache trang public 60s — sau seed, đợi tối đa 1 phút hoặc Redeploy */
+export const revalidate = 60;
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const [settings, nav] = await Promise.all([getSiteSettings(), getPublicNavData()]);

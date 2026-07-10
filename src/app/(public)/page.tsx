@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { buildMetadata, getSiteSettings } from "@/lib/seo";
 import { parseImages } from "@/lib/images";
 import { LOCATION_EXCERPTS } from "@/lib/local-seo";
+import { getPublicNavData } from "@/lib/site-data";
+import { safeQuery } from "@/lib/safe-query";
 import Hero from "@/components/public/Hero";
 import ServiceCard from "@/components/public/ServiceCard";
 import ProjectGallery from "@/components/public/ProjectGallery";
@@ -74,42 +76,68 @@ const usps = [
 
 export default async function HomePage() {
   const settings = await getSiteSettings();
-  let services: Awaited<ReturnType<typeof prisma.service.findMany>> = [];
-  let projects: Awaited<
-    ReturnType<
-      typeof prisma.project.findMany<{
-        include: { location: { select: { title: true } } };
-      }>
-    >
-  > = [];
-  let locations: Awaited<ReturnType<typeof prisma.location.findMany>> = [];
-  let faqs: Awaited<ReturnType<typeof prisma.faq.findMany>> = [];
+  const nav = await getPublicNavData();
 
-  try {
-    [services, projects, locations, faqs] = await Promise.all([
-      prisma.service.findMany({
-        where: { published: true },
-        orderBy: { order: "asc" },
-      }),
+  const projects = await safeQuery(
+    "home.projects",
+    () =>
       prisma.project.findMany({
         where: { published: true },
         orderBy: { createdAt: "desc" },
         take: 6,
         include: { location: { select: { title: true } } },
       }),
-      prisma.location.findMany({
-        where: { published: true },
-        orderBy: { order: "asc" },
-      }),
+    []
+  );
+  const faqs = await safeQuery(
+    "home.faqs",
+    () =>
       prisma.faq.findMany({
         where: { published: true },
         orderBy: { order: "asc" },
         take: 5,
       }),
-    ]);
-  } catch (e) {
-    console.error("HomePage: database unavailable", e);
-  }
+    []
+  );
+
+  // Dùng cùng nguồn nav đã cache (tránh query trùng + Promise.all all-or-nothing)
+  const services = await safeQuery(
+    "home.services",
+    () =>
+      prisma.service.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      }),
+    []
+  );
+  const locations = await safeQuery(
+    "home.locations",
+    () =>
+      prisma.location.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      }),
+    []
+  );
+
+  // Nếu full query lỗi nhưng nav còn data — vẫn hiện card tối thiểu từ nav
+  const serviceCards =
+    services.length > 0
+      ? services
+      : nav.services.map((s) => ({
+          slug: s.slug,
+          title: s.title,
+          shortDescription: null as string | null,
+          images: "[]",
+        }));
+  const locationCards =
+    locations.length > 0
+      ? locations
+      : nav.locations.map((l) => ({
+          slug: l.slug,
+          title: l.title,
+          images: "[]",
+        }));
 
   const projectItems = projects.map((p) => ({
     slug: p.slug,
@@ -152,16 +180,19 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((s) => (
+            {serviceCards.map((s) => (
               <ServiceCard
                 key={s.slug}
                 slug={s.slug}
                 title={s.title}
-                shortDescription={s.shortDescription}
-                images={parseImages(s.images)}
+                shortDescription={"shortDescription" in s ? s.shortDescription : null}
+                images={parseImages("images" in s ? s.images : "[]")}
               />
             ))}
           </div>
+          {serviceCards.length === 0 && (
+            <p className="mt-6 text-center text-gray-500">Chưa có dịch vụ nào được đăng tải.</p>
+          )}
         </div>
       </section>
 
@@ -180,16 +211,19 @@ export default async function HomePage() {
           <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">Khu vực phục vụ</h2>
           <p className="mt-2 text-gray-600">Khảo sát, báo giá miễn phí tận nơi trong ngày.</p>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
-            {locations.map((loc) => (
+            {locationCards.map((loc) => (
               <LocationCard
                 key={loc.slug}
                 slug={loc.slug}
                 title={loc.title}
-                images={parseImages(loc.images)}
+                images={parseImages("images" in loc ? loc.images : "[]")}
                 excerpt={LOCATION_EXCERPTS[loc.slug] || `Thi công tại ${loc.title}.`}
               />
             ))}
           </div>
+          {locationCards.length === 0 && (
+            <p className="mt-6 text-center text-gray-500">Chưa có khu vực nào được đăng tải.</p>
+          )}
         </div>
       </section>
 
