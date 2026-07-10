@@ -46,9 +46,14 @@ NEXT_PUBLIC_SITE_URL=https://trannano.vn
    - Tạo **R2 API Token** với quyền Object Read & Write cho bucket đó.
    - Điền toàn bộ `R2_*` + `NEXT_PUBLIC_R2_PUBLIC_URL` trên Vercel.
 5. Push code lên GitHub, import repo vào Vercel; khai báo env ở mục 1.
-6. Trỏ domain `trannano.vn` về Vercel.
-7. Vào `/admin/login`, đổi mật khẩu sau lần đăng nhập đầu.
-8. Submit `https://trannano.vn/sitemap.xml` vào Google Search Console.
+6. Trỏ domain `trannano.vn` **và** `www.trannano.vn` về Vercel.
+7. **Primary domain (bắt buộc):** Vercel → Project → Settings → Domains → đặt **`trannano.vn`** (không www) làm **Primary**.
+   - Vercel sẽ 301/308 `www.trannano.vn` → `https://trannano.vn`.
+   - Canonical / sitemap trong code cũng dùng `https://trannano.vn`.
+   - Nếu Primary đang là `www`, apex sẽ redirect sang www trong khi canonical vẫn non-www → Google bị rối tín hiệu index.
+8. Env `NEXT_PUBLIC_SITE_URL=https://trannano.vn` (không www).
+9. Vào `/admin/login`, đổi mật khẩu sau lần đăng nhập đầu.
+10. Submit `https://trannano.vn/sitemap.xml` vào Google Search Console (property non-www).
 
 ## 4. Quy trình cập nhật sau này
 

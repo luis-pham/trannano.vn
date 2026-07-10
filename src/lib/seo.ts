@@ -4,10 +4,22 @@ import { getSiteSettings } from "./site-data";
 
 export { getSiteSettings } from "./site-data";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://trannano.vn";
+/** Canonical host — luôn non-www, khớp domain mua và redirect chính thức. */
+export const CANONICAL_ORIGIN = "https://trannano.vn";
 
+/**
+ * URL gốc site cho canonical / sitemap / JSON-LD.
+ * Production luôn `https://trannano.vn` (bỏ www nếu env lỡ ghi www).
+ */
 export function getSiteUrl() {
-  return SITE_URL.replace(/\/$/, "");
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL || CANONICAL_ORIGIN).replace(/\/$/, "");
+  try {
+    const host = new URL(raw).hostname.replace(/^www\./i, "");
+    if (host === "trannano.vn") return CANONICAL_ORIGIN;
+    return raw;
+  } catch {
+    return CANONICAL_ORIGIN;
+  }
 }
 
 /** Resolve relative paths like /images/x.png to absolute URL for OG tags */
