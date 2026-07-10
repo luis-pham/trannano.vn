@@ -74,7 +74,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
     <>
       <JsonLd data={buildBlogPostingJsonLd(post, settings.businessName)} />
       <div className="bg-brand py-12 text-white">
-        <div className="mx-auto max-w-3xl px-4 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <Breadcrumbs
             light
             items={[
@@ -99,7 +99,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
         </div>
       </div>
 
-      <article className="mx-auto max-w-3xl px-4 py-12 lg:px-8">
+      <article className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
         <div className="relative mb-10 aspect-[2/1] overflow-hidden rounded-xl bg-surface-muted">
           <Image
             src={cover}

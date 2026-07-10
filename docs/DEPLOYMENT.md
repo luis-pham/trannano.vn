@@ -5,7 +5,13 @@
 Tạo `.env` (không commit) dựa theo `.env.example`:
 
 ```
-DATABASE_URL=              # PostgreSQL (Supabase: Project Settings > Database)
+# Vercel (serverless) — BẮT BUỘC dùng Transaction pooler + pgbouncer=true
+# Supabase → Project Settings → Database → Connection string → Transaction (port 6543)
+DATABASE_URL=postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1
+
+# Seed / migrate local → dùng Direct connection (port 5432, host db.xxx.supabase.co), KHÔNG dùng pooler
+# DATABASE_URL=postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres?sslmode=require
+
 JWT_SECRET=                # openssl rand -base64 32
 R2_ACCOUNT_ID=             # Cloudflare dashboard → R2 → Overview
 R2_ACCESS_KEY_ID=          # R2 → Manage R2 API Tokens
@@ -15,6 +21,8 @@ R2_PUBLIC_URL=             # https://pub-xxxxx.r2.dev hoặc https://cdn.trannan
 NEXT_PUBLIC_R2_PUBLIC_URL= # cùng giá trị R2_PUBLIC_URL (cho next/image lúc build)
 NEXT_PUBLIC_SITE_URL=https://trannano.vn
 ```
+
+> **Quan trọng:** Thiếu `?pgbouncer=true` trên pooler `:6543` → Prisma lỗi prepared statement → trang **lúc có data lúc trống**. Password có ký tự đặc biệt (`@`, `#`, `%`…) phải URL-encode.
 
 ## 2. Hạ tầng đề xuất
 
@@ -27,9 +35,12 @@ NEXT_PUBLIC_SITE_URL=https://trannano.vn
 
 ## 3. Các bước deploy lần đầu
 
-1. Tạo project Supabase, lấy `DATABASE_URL`.
-2. Chạy `npx prisma migrate deploy` (hoặc `db push`) trên DB production.
-3. Chạy seed (`npx prisma db seed`) — tạo AdminUser đầu tiên.
+1. Tạo project Supabase.
+   - **Vercel:** Connection string → **Transaction** pooler (`:6543`) + `?pgbouncer=true&connection_limit=1`.
+   - **Migrate/seed từ máy local:** Direct (`db.…supabase.co:5432`).
+2. Chạy `npx prisma migrate deploy` (hoặc `db push`) trên DB production (Direct URL).
+3. Chạy seed (`npx prisma db seed`) — tạo AdminUser đầu tiên (Direct URL).
+4. Kiểm tra sau deploy: mở `/api/health/db` — cần `connected: true`, `hasPgBouncer: true`, `seedComplete: true`.
 4. Tạo R2 bucket trên Cloudflare:
    - Bật **Public access** (R2.dev subdomain) **hoặc** gắn custom domain (vd. `cdn.trannano.vn`).
    - Tạo **R2 API Token** với quyền Object Read & Write cho bucket đó.
