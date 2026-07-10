@@ -4,14 +4,17 @@ import { BRAND_LOGO, BRAND_TAGLINE, COMPANY_NAME } from "@/lib/brand";
 import { prisma } from "@/lib/prisma";
 
 export default async function Footer() {
-  const [settings, locations] = await Promise.all([
-    getSiteSettings(),
-    prisma.location.findMany({
+  const settings = await getSiteSettings();
+  let locations: { slug: string; title: string }[] = [];
+  try {
+    locations = await prisma.location.findMany({
       where: { published: true },
       orderBy: { order: "asc" },
       select: { slug: true, title: true },
-    }),
-  ]);
+    });
+  } catch (e) {
+    console.error("Footer: database unavailable", e);
+  }
 
   const footerLinks = [
     { href: "/", label: "Trang chủ" },

@@ -5,19 +5,25 @@ import { BRAND_LOGO, BRAND_TAGLINE } from "@/lib/brand";
 import HeaderNav from "./HeaderNav";
 
 export default async function Header() {
-  const [settings, services, locations] = await Promise.all([
-    getSiteSettings(),
-    prisma.service.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-      select: { slug: true, title: true },
-    }),
-    prisma.location.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-      select: { slug: true, title: true },
-    }),
-  ]);
+  const settings = await getSiteSettings();
+  let services: { slug: string; title: string }[] = [];
+  let locations: { slug: string; title: string }[] = [];
+  try {
+    [services, locations] = await Promise.all([
+      prisma.service.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+        select: { slug: true, title: true },
+      }),
+      prisma.location.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+        select: { slug: true, title: true },
+      }),
+    ]);
+  } catch (e) {
+    console.error("Header: database unavailable", e);
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">

@@ -13,17 +13,24 @@ import ContactForm from "@/components/public/ContactForm";
 
 
 export async function generateMetadata() {
-  const page = await prisma.page.findUnique({ where: { slug: "trang-chu" } });
-  return buildMetadata({
-    title: page?.metaTitle,
-    description: page?.metaDescription,
-    ogImage: page?.ogImage,
-    path: "/",
-    // Dùng defaultMetaTitle (đã có brand) — không ghép thêm page.title
-    fallbackDescription:
-      page?.metaDescription ||
-      "Thi công trần nhựa nano, ốp tường nhựa, lát sàn nhựa giả gỗ tại Thanh Hoá, Ninh Bình, Hà Nam. Báo giá miễn phí tận nơi.",
-  });
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: "trang-chu" } });
+    return buildMetadata({
+      title: page?.metaTitle,
+      description: page?.metaDescription,
+      ogImage: page?.ogImage,
+      path: "/",
+      fallbackDescription:
+        page?.metaDescription ||
+        "Thi công trần nhựa nano, ốp tường nhựa, lát sàn nhựa giả gỗ tại Thanh Hoá, Ninh Bình, Hà Nam. Báo giá miễn phí tận nơi.",
+    });
+  } catch {
+    return buildMetadata({
+      path: "/",
+      fallbackDescription:
+        "Thi công trần nhựa nano, ốp tường nhựa, lát sàn nhựa giả gỗ tại Thanh Hoá, Ninh Bình, Hà Nam. Báo giá miễn phí tận nơi.",
+    });
+  }
 }
 
 const usps = [
@@ -66,28 +73,43 @@ const usps = [
 ];
 
 export default async function HomePage() {
-  const [settings, services, projects, locations, faqs] = await Promise.all([
-    getSiteSettings(),
-    prisma.service.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-    }),
-    prisma.project.findMany({
-      where: { published: true },
-      orderBy: { createdAt: "desc" },
-      take: 6,
-      include: { location: { select: { title: true } } },
-    }),
-    prisma.location.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-    }),
-    prisma.faq.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-      take: 5,
-    }),
-  ]);
+  const settings = await getSiteSettings();
+  let services: Awaited<ReturnType<typeof prisma.service.findMany>> = [];
+  let projects: Awaited<
+    ReturnType<
+      typeof prisma.project.findMany<{
+        include: { location: { select: { title: true } } };
+      }>
+    >
+  > = [];
+  let locations: Awaited<ReturnType<typeof prisma.location.findMany>> = [];
+  let faqs: Awaited<ReturnType<typeof prisma.faq.findMany>> = [];
+
+  try {
+    [services, projects, locations, faqs] = await Promise.all([
+      prisma.service.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      }),
+      prisma.project.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+        include: { location: { select: { title: true } } },
+      }),
+      prisma.location.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      }),
+      prisma.faq.findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+        take: 5,
+      }),
+    ]);
+  } catch (e) {
+    console.error("HomePage: database unavailable", e);
+  }
 
   const projectItems = projects.map((p) => ({
     slug: p.slug,
