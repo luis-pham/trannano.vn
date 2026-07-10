@@ -1,6 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { phoneTel, zaloLink } from "@/lib/seo";
-import { BRAND_LOGO, BRAND_TAGLINE, COMPANY_NAME } from "@/lib/brand";
+import { BRAND_LOGO, BRAND_LOGO_SRC, BRAND_TAGLINE, COMPANY_NAME } from "@/lib/brand";
 
 type FooterSettings = {
   phone: string;
@@ -34,8 +35,19 @@ export default function Footer({ settings, locations }: FooterProps) {
       <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="text-xl font-bold tracking-tight">{BRAND_LOGO}</p>
-            <p className="mt-1 text-sm font-medium text-accent">{BRAND_TAGLINE}</p>
+            <div className="flex items-center gap-2.5">
+              <Image
+                src={BRAND_LOGO_SRC}
+                alt={BRAND_LOGO}
+                width={40}
+                height={40}
+                className="h-10 w-10 shrink-0 object-contain"
+              />
+              <div>
+                <p className="text-xl font-bold tracking-tight">{BRAND_LOGO}</p>
+                <p className="text-sm font-medium text-accent">{BRAND_TAGLINE}</p>
+              </div>
+            </div>
             <p className="mt-3 text-sm text-white/80">{COMPANY_NAME}</p>
             <p className="mt-2 text-sm text-white/70">
               Thi công trần nhựa nano, ốp tường, sàn nhựa giả gỗ tại Ninh Bình, Thanh Hoá, Hà Nam.
