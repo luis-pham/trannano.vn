@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Page {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  content         String
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Service {
+  id               String      @id @default(cuid())
+  slug             String      @unique
+  title            String
+  shortDescription String?
+  content          String
+  images           String      @default("[]") // JSON array of URLs (SQLite)
+  iconUrl          String?
+  metaTitle        String?
+  metaDescription  String?
+  ogImage          String?
+  order            Int         @default(0)
+  published        Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  faqs             Faq[]
+  priceItems       PriceItem[]
+}
+
+model Location {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  content         String
+  images          String    @default("[]")
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  order           Int       @default(0)
+  published       Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  projects        Project[]
+}
+
+model Project {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  content         String
+  images          String    @default("[]")
+  projectDate     DateTime?
+  locationId      String?
+  location        Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  published       Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model BlogPost {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  excerpt         String?
+  content         String
+  coverImage      String?
+  category        String?
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  published       Boolean  @default(false)
+  publishedAt     DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  serviceId String?
+  service   Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  order     Int      @default(0)
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PriceItem {
+  id        String   @id @default(cuid())
+  serviceId String?
+  service   Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  name      String
+  priceFrom Int
+  unit      String   @default("m2")
+  note      String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSettings {
+  id                     String @id @default("singleton")
+  businessName           String @default("Nội Thất Tài Đức")
+  phone                  String @default("0986.979.353")
+  zaloUrl                String?
+  address                String?
+  workingHours           String @default("Nhận điện thoại 24/7")
+  serviceAreas           String @default("Ninh Bình, Thanh Hoá, Hà Nam")
+  mapEmbedUrl            String?
+  facebookUrl            String?
+  googleBusinessUrl      String?
+  defaultMetaTitle       String @default("Trannano.vn - Nội Thất Tài Đức | Chuyên Thi Công Trần Nano")
+  defaultMetaDescription String @default("Nội Thất Tài Đức (Trannano.vn) chuyên thi công trần nhựa nano, ốp tường nhựa, lát sàn nhựa giả gỗ tại Thanh Hoá, Ninh Bình, Hà Nam. Báo giá miễn phí tận nơi, bảo hành dài hạn.")
+  defaultOgImage         String @default("/images/hero.jpg")
+}
+
