@@ -119,7 +119,7 @@ export default function HeaderNav({ phone, services, locations }: HeaderNavProps
           href={phoneTel(phone)}
           className="rounded-full bg-accent px-3 py-2 text-sm font-semibold text-brand"
         >
-          Gọi
+          Gọi Ngay
         </a>
         <button
           type="button"
