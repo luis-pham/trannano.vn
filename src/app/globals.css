@@ -53,6 +53,18 @@
   .prose-brand strong {
     @apply font-semibold text-gray-900;
   }
+
+  .prose-brand table {
+    @apply my-6 w-full border-collapse overflow-hidden rounded-lg text-sm;
+  }
+
+  .prose-brand thead th {
+    @apply border border-gray-200 bg-surface-muted px-4 py-3 text-left font-semibold text-gray-900;
+  }
+
+  .prose-brand tbody td {
+    @apply border border-gray-200 px-4 py-3 text-gray-700;
+  }
 }
 
 .ProseMirror {
@@ -92,4 +104,50 @@
   max-width: 100%;
   height: auto;
   border-radius: 0.375rem;
+}
+
+.ProseMirror table {
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  table-layout: fixed;
+  width: 100%;
+  overflow: hidden;
+}
+
+.ProseMirror td,
+.ProseMirror th {
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
+  min-width: 1em;
+  padding: 0.4rem 0.6rem;
+  position: relative;
+  vertical-align: top;
+}
+
+.ProseMirror th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  text-align: left;
+}
+
+.ProseMirror .selectedCell::after {
+  background: rgba(26, 16, 12, 0.08);
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+.ProseMirror .column-resize-handle {
+  background-color: #1a100c;
+  bottom: -2px;
+  pointer-events: none;
+  position: absolute;
+  right: -2px;
+  top: 0;
+  width: 3px;
 }
