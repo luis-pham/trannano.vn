@@ -131,6 +131,7 @@ model SiteSettings {
   mapEmbedUrl            String?
   facebookUrl            String?
   googleBusinessUrl      String?
+  heroImages             String @default("[\"/images/hero-banner.png\"]")
   defaultMetaTitle       String @default("Trannano.vn - Nội Thất Tài Đức | Chuyên Thi Công Trần Nano")
   defaultMetaDescription String @default("Nội Thất Tài Đức (Trannano.vn) chuyên thi công trần nhựa nano, ốp tường nhựa, lát sàn nhựa giả gỗ tại Thanh Hoá, Ninh Bình, Hà Nam. Báo giá miễn phí tận nơi, bảo hành dài hạn.")
   defaultOgImage         String @default("/images/hero.jpg")

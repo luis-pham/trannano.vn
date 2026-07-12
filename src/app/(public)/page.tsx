@@ -148,7 +148,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero phone={settings.phone} />
+      <Hero phone={settings.phone} images={parseImages(settings.heroImages)} />
 
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">

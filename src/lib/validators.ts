@@ -88,6 +88,7 @@ export const settingsSchema = z.object({
   mapEmbedUrl: z.string().optional().nullable(),
   facebookUrl: z.string().optional().nullable(),
   googleBusinessUrl: z.string().optional().nullable(),
+  heroImages: z.array(z.string()).optional().default([]),
   defaultMetaTitle: z.string().min(1),
   defaultMetaDescription: z.string().min(1),
   defaultOgImage: z.string().optional().nullable(),

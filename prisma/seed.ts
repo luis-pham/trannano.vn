@@ -25,6 +25,7 @@ async function main() {
       facebookUrl: "https://www.facebook.com/trannhuanano",
       googleBusinessUrl: "https://maps.app.goo.gl/WZ7Mh8CeyY5Frvxw6",
       mapEmbedUrl: "https://www.google.com/maps?q=19.9949165,105.485175&z=10&hl=vi&output=embed",
+      heroImages: '["/images/hero-banner.png"]',
       workingHours: "Nhận điện thoại 24/7",
       serviceAreas: "Ninh Bình, Thanh Hoá, Hà Nam",
       defaultOgImage: "/images/hero.jpg",
@@ -42,6 +43,7 @@ async function main() {
       facebookUrl: "https://www.facebook.com/trannhuanano",
       googleBusinessUrl: "https://maps.app.goo.gl/WZ7Mh8CeyY5Frvxw6",
       mapEmbedUrl: "https://www.google.com/maps?q=19.9949165,105.485175&z=10&hl=vi&output=embed",
+      heroImages: '["/images/hero-banner.png"]',
       workingHours: "Nhận điện thoại 24/7",
       serviceAreas: "Ninh Bình, Thanh Hoá, Hà Nam",
       defaultMetaTitle:

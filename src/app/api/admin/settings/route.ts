@@ -3,15 +3,19 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { settingsSchema } from "@/lib/validators";
 import { jsonError, zodError, nullIfEmpty } from "@/lib/api";
+import { stringifyImages } from "@/lib/images";
 
 export const dynamic = "force-dynamic";
 
 const SETTINGS_ID = "singleton";
+const DEFAULT_HERO = '["/images/hero-banner.png"]';
 
 export async function GET() {
   let settings = await prisma.siteSettings.findUnique({ where: { id: SETTINGS_ID } });
   if (!settings) {
-    settings = await prisma.siteSettings.create({ data: { id: SETTINGS_ID } });
+    settings = await prisma.siteSettings.create({
+      data: { id: SETTINGS_ID, heroImages: DEFAULT_HERO },
+    });
   }
   return NextResponse.json(settings);
 }
@@ -22,6 +26,10 @@ export async function PUT(request: NextRequest) {
     const parsed = settingsSchema.safeParse(body);
     if (!parsed.success) return zodError(parsed.error);
     const data = parsed.data;
+    const heroImages =
+      data.heroImages && data.heroImages.length > 0
+        ? stringifyImages(data.heroImages)
+        : DEFAULT_HERO;
 
     const item = await prisma.siteSettings.upsert({
       where: { id: SETTINGS_ID },
@@ -36,6 +44,7 @@ export async function PUT(request: NextRequest) {
         mapEmbedUrl: nullIfEmpty(data.mapEmbedUrl) ?? null,
         facebookUrl: nullIfEmpty(data.facebookUrl) ?? null,
         googleBusinessUrl: nullIfEmpty(data.googleBusinessUrl) ?? null,
+        heroImages,
         defaultMetaTitle: data.defaultMetaTitle,
         defaultMetaDescription: data.defaultMetaDescription,
         defaultOgImage: nullIfEmpty(data.defaultOgImage) ?? "",
@@ -50,6 +59,7 @@ export async function PUT(request: NextRequest) {
         mapEmbedUrl: nullIfEmpty(data.mapEmbedUrl) ?? null,
         facebookUrl: nullIfEmpty(data.facebookUrl) ?? null,
         googleBusinessUrl: nullIfEmpty(data.googleBusinessUrl) ?? null,
+        heroImages,
         defaultMetaTitle: data.defaultMetaTitle,
         defaultMetaDescription: data.defaultMetaDescription,
         defaultOgImage: nullIfEmpty(data.defaultOgImage) ?? "",
@@ -58,6 +68,7 @@ export async function PUT(request: NextRequest) {
 
     revalidateTag("site-settings");
     revalidatePath("/", "layout");
+    revalidatePath("/");
     return NextResponse.json(item);
   } catch (e) {
     console.error(e);

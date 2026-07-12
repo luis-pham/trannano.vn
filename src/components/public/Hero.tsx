@@ -1,12 +1,13 @@
-import Image from "next/image";
 import { phoneTel } from "@/lib/seo";
 import { COMPANY_NAME } from "@/lib/brand";
+import HeroCarousel from "./HeroCarousel";
 
 type HeroProps = {
   phone: string;
+  images?: string[];
 };
 
-export default function Hero({ phone }: HeroProps) {
+export default function Hero({ phone, images = [] }: HeroProps) {
   return (
     <section className="bg-brand text-white">
       <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-12 lg:grid-cols-2 lg:gap-10 lg:px-8 lg:py-16">
@@ -41,16 +42,7 @@ export default function Hero({ phone }: HeroProps) {
           </a>
         </div>
 
-        <div className="relative aspect-[4/3] w-full overflow-hidden lg:aspect-auto lg:min-h-[480px]">
-          <Image
-            src="/images/hero-banner.png"
-            alt="Công trình trần nhựa nano Nội Thất Tài Đức"
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 640px"
-            className="object-cover object-right"
-          />
-        </div>
+        <HeroCarousel images={images} />
       </div>
     </section>
   );

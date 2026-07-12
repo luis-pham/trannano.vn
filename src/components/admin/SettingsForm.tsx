@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import AdminFormShell, { inputClass, labelClass } from "./AdminFormShell";
+import ImageUploader from "./ImageUploader";
+import { parseImages } from "@/lib/images";
 
 type SettingsFormData = {
   businessName: string;
@@ -13,6 +15,7 @@ type SettingsFormData = {
   mapEmbedUrl: string;
   facebookUrl: string;
   googleBusinessUrl: string;
+  heroImages: string[];
   defaultMetaTitle: string;
   defaultMetaDescription: string;
   defaultOgImage: string;
@@ -28,6 +31,7 @@ const empty: SettingsFormData = {
   mapEmbedUrl: "",
   facebookUrl: "",
   googleBusinessUrl: "",
+  heroImages: [],
   defaultMetaTitle: "",
   defaultMetaDescription: "",
   defaultOgImage: "",
@@ -47,6 +51,7 @@ export default function SettingsForm() {
           setMessage({ type: "error", text: data.error });
           return;
         }
+        const heroes = parseImages(data.heroImages);
         setForm({
           businessName: data.businessName || "",
           phone: data.phone || "",
@@ -57,6 +62,7 @@ export default function SettingsForm() {
           mapEmbedUrl: data.mapEmbedUrl || "",
           facebookUrl: data.facebookUrl || "",
           googleBusinessUrl: data.googleBusinessUrl || "",
+          heroImages: heroes.length > 0 ? heroes : ["/images/hero-banner.png"],
           defaultMetaTitle: data.defaultMetaTitle || "",
           defaultMetaDescription: data.defaultMetaDescription || "",
           defaultOgImage: data.defaultOgImage || "",
@@ -80,6 +86,7 @@ export default function SettingsForm() {
         mapEmbedUrl: form.mapEmbedUrl || null,
         facebookUrl: form.facebookUrl || null,
         googleBusinessUrl: form.googleBusinessUrl || null,
+        heroImages: form.heroImages,
         defaultOgImage: form.defaultOgImage || null,
       }),
     });
@@ -108,7 +115,7 @@ export default function SettingsForm() {
         <div>
           <label className={labelClass}>Tên công ty *</label>
           <input className={inputClass} value={form.businessName} onChange={(e) => setForm({ ...form, businessName: e.target.value })} required />
-          <p className="mt-1 text-xs text-gray-500">Logo hiển thị: Trannano.vn · Tagline: Chuyên Thi Công Trần Nano</p>
+          <p className="mt-1 text-xs text-gray-500">Logo hiển thị: TranNano.vn · Tagline: Chuyên Thi Công Trần Nano</p>
         </div>
         <div>
           <label className={labelClass}>Số điện thoại *</label>
@@ -149,6 +156,18 @@ export default function SettingsForm() {
           <label className={labelClass}>Google Business URL</label>
           <input className={inputClass} value={form.googleBusinessUrl} onChange={(e) => setForm({ ...form, googleBusinessUrl: e.target.value })} />
         </div>
+      </fieldset>
+
+      <fieldset className="space-y-4 rounded-lg border border-gray-200 p-4">
+        <legend className="px-1 text-sm font-medium text-gray-700">Carousel trang chủ</legend>
+        <p className="text-sm text-gray-500">
+          Ảnh hiển thị bên phải hero trang chủ. Kéo thả để đổi thứ tự, tự chuyển slide mỗi 5 giây.
+        </p>
+        <ImageUploader
+          images={form.heroImages}
+          onChange={(heroImages) => setForm({ ...form, heroImages })}
+          max={12}
+        />
       </fieldset>
 
       <fieldset className="space-y-4 rounded-lg border border-gray-200 p-4">

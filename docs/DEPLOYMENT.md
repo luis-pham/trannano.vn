@@ -41,6 +41,7 @@ NEXT_PUBLIC_SITE_URL=https://trannano.vn
 2. Chạy `npx prisma migrate deploy` (hoặc `db push`) trên DB production (Direct URL).
 3. Chạy seed (`npx prisma db seed`) — tạo AdminUser đầu tiên (Direct URL).
 4. Kiểm tra sau deploy: mở `/api/health/db` — cần `connected: true`, `hasPgBouncer: true`, `seedComplete: true`.
+5. Sau khi thêm field schema mới (vd. `heroImages`): chạy `npx prisma db push` với Direct URL lên Supabase, rồi Redeploy.
 4. Tạo R2 bucket trên Cloudflare:
    - Bật **Public access** (R2.dev subdomain) **hoặc** gắn custom domain (vd. `cdn.trannano.vn`).
    - Tạo **R2 API Token** với quyền Object Read & Write cho bucket đó.

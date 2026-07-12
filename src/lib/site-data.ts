@@ -2,6 +2,8 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { BRAND_ADDRESS } from "@/lib/brand";
 
+export const DEFAULT_HERO_IMAGES = '["/images/hero-banner.png"]';
+
 export const DEFAULT_SETTINGS = {
   id: "singleton",
   businessName: "Nội Thất Tài Đức",
@@ -13,6 +15,7 @@ export const DEFAULT_SETTINGS = {
   mapEmbedUrl: null as string | null,
   facebookUrl: null as string | null,
   googleBusinessUrl: null as string | null,
+  heroImages: DEFAULT_HERO_IMAGES,
   defaultMetaTitle: "Trannano.vn - Nội Thất Tài Đức | Chuyên Thi Công Trần Nano",
   defaultMetaDescription:
     "Nội Thất Tài Đức (Trannano.vn) chuyên thi công trần nhựa nano, ốp tường nhựa, lát sàn nhựa giả gỗ tại Ninh Bình, Thanh Hoá, Hà Nam. Báo giá miễn phí tận nơi, bảo hành dài hạn.",
@@ -27,6 +30,7 @@ export const getSiteSettings = cache(async () => {
       return {
         ...existing,
         address: existing.address?.trim() || BRAND_ADDRESS,
+        heroImages: existing.heroImages?.trim() || DEFAULT_HERO_IMAGES,
       };
     }
     return await prisma.siteSettings.create({
@@ -34,6 +38,7 @@ export const getSiteSettings = cache(async () => {
         id: "singleton",
         defaultOgImage: "/images/hero.jpg",
         address: BRAND_ADDRESS,
+        heroImages: DEFAULT_HERO_IMAGES,
       },
     });
   } catch (e) {
