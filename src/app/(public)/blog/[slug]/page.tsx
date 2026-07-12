@@ -79,7 +79,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
             light
             items={[
               { name: "Trang chủ", href: "/" },
-              { name: "Blog", href: "/blog" },
+              { name: "Tin tức", href: "/blog" },
               { name: post.title },
             ]}
           />
@@ -135,7 +135,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
             }))}
           />
           <Link href="/blog" className="inline-block text-sm font-medium text-brand hover:underline">
-            ← Quay lại danh sách bài viết
+            ← Quay lại tin tức
           </Link>
         </div>
       </article>

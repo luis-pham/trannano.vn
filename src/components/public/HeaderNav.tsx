@@ -17,7 +17,7 @@ const navLinks = [
   { href: "/", label: "Trang chủ" },
   { href: "/du-an", label: "Dự án đã hoàn thành" },
   { href: "/bang-gia", label: "Bảng giá" },
-  { href: "/blog", label: "Blog" },
+  { href: "/blog", label: "Tin tức" },
   { href: "/lien-he", label: "Liên hệ" },
 ];
 

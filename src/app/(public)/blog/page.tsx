@@ -9,9 +9,9 @@ import Breadcrumbs from "@/components/public/Breadcrumbs";
 export async function generateMetadata() {
   return buildMetadata({
     path: "/blog",
-    fallbackTitle: "Blog kiến thức trần nhựa nano, sàn nhựa",
+    fallbackTitle: "Tin tức trần nhựa nano, sàn nhựa",
     fallbackDescription:
-      "Bài viết tư vấn về trần nhựa nano, sàn nhựa giả gỗ, bảo quản và chọn mẫu phù hợp.",
+      "Tin tức và bài viết tư vấn về trần nhựa nano, sàn nhựa giả gỗ, bảo quản và chọn mẫu phù hợp.",
   });
 }
 
@@ -34,10 +34,10 @@ export default async function BlogPage() {
             light
             items={[
               { name: "Trang chủ", href: "/" },
-              { name: "Blog" },
+              { name: "Tin tức" },
             ]}
           />
-          <h1 className="text-3xl font-bold md:text-4xl">Blog</h1>
+          <h1 className="text-3xl font-bold md:text-4xl">Tin tức</h1>
           <p className="mt-3 max-w-2xl text-white/90">
             Kiến thức, kinh nghiệm về trần nhựa nano và sàn nhựa giả gỗ.
           </p>
