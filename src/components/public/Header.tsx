@@ -23,7 +23,7 @@ export default function Header({ phone, services, locations }: HeaderProps) {
             priority
           />
           <span className="flex flex-col leading-tight">
-            <span className="text-xl font-bold text-brand">{BRAND_LOGO}</span>
+            <span className="text-xl font-bold text-brand">TranNano.vn</span>
             <span className="hidden text-[11px] font-medium text-gray-500 sm:block">
               {BRAND_TAGLINE}
             </span>
