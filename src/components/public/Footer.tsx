@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { phoneTel, zaloLink } from "@/lib/seo";
-import { BRAND_LOGO, BRAND_LOGO_SRC, BRAND_TAGLINE, COMPANY_NAME } from "@/lib/brand";
+import { BRAND_LOGO, BRAND_LOGO_SRC, BRAND_TAGLINE, COMPANY_NAME, YOUTUBE_URL } from "@/lib/brand";
 
 type FooterSettings = {
   phone: string;
@@ -110,6 +110,14 @@ export default function Footer({ settings, locations }: FooterProps) {
                 className="text-sm text-white/80 hover:text-accent"
               >
                 Facebook
+              </a>
+              <a
+                href={YOUTUBE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-white/80 hover:text-accent"
+              >
+                YouTube
               </a>
               <a
                 href={settings.googleBusinessUrl || "https://maps.app.goo.gl/WZ7Mh8CeyY5Frvxw6"}

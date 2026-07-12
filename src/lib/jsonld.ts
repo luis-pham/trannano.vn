@@ -1,5 +1,5 @@
 import { getSiteUrl } from "./seo";
-import { BRAND_LOGO, BRAND_TAGLINE } from "./brand";
+import { BRAND_LOGO, BRAND_TAGLINE, YOUTUBE_URL } from "./brand";
 
 /** Thứ tự chuẩn theo SEO_SPEC — luôn đủ 3 tỉnh */
 export const CANONICAL_SERVICE_AREAS = ["Ninh Bình", "Thanh Hoá", "Hà Nam"] as const;
@@ -64,6 +64,7 @@ export function buildLocalBusinessJsonLd(settings: {
     settings.facebookUrl,
     settings.googleBusinessUrl,
     settings.zaloUrl,
+    YOUTUBE_URL,
   ].filter((u): u is string => Boolean(u?.trim()));
 
   const image = settings.defaultOgImage?.trim()
@@ -108,6 +109,8 @@ export function buildLocalBusinessJsonLd(settings: {
     data.address = {
       "@type": "PostalAddress",
       streetAddress: settings.address,
+      addressLocality: "Thanh Hoá",
+      addressRegion: "Thanh Hoá",
       addressCountry: "VN",
     };
   }

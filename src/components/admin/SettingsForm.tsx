@@ -120,7 +120,13 @@ export default function SettingsForm() {
         </div>
         <div>
           <label className={labelClass}>Địa chỉ</label>
-          <textarea className={inputClass} rows={2} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+          <textarea
+            className={inputClass}
+            rows={2}
+            value={form.address}
+            onChange={(e) => setForm({ ...form, address: e.target.value })}
+            placeholder="Xã Quang Trung, Thanh Hoá"
+          />
         </div>
         <div>
           <label className={labelClass}>Thời gian liên hệ *</label>

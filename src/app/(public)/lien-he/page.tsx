@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { buildMetadata, getSiteSettings, toMapEmbedUrl } from "@/lib/seo";
+import { YOUTUBE_URL } from "@/lib/brand";
 import { safeQuery } from "@/lib/safe-query";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ProseContent from "@/components/public/ProseContent";
@@ -82,6 +83,19 @@ export default async function LienHePage() {
                   <dd className="mt-1 text-gray-900">{settings.address}</dd>
                 </div>
               )}
+              <div>
+                <dt className="text-sm font-medium text-gray-500">YouTube</dt>
+                <dd className="mt-1">
+                  <a
+                    href={YOUTUBE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-brand hover:underline"
+                  >
+                    youtube.com/@thicongtrannano
+                  </a>
+                </dd>
+              </div>
             </dl>
           </div>
 

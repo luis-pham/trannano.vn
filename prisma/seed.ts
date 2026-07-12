@@ -21,6 +21,7 @@ async function main() {
     where: { id: "singleton" },
     update: {
       businessName: "Nội Thất Tài Đức",
+      address: "Xã Quang Trung, Thanh Hoá",
       facebookUrl: "https://www.facebook.com/trannhuanano",
       googleBusinessUrl: "https://maps.app.goo.gl/WZ7Mh8CeyY5Frvxw6",
       mapEmbedUrl: "https://www.google.com/maps?q=19.9949165,105.485175&z=10&hl=vi&output=embed",
@@ -36,6 +37,7 @@ async function main() {
       id: "singleton",
       businessName: "Nội Thất Tài Đức",
       phone: "0986.979.353",
+      address: "Xã Quang Trung, Thanh Hoá",
       zaloUrl: "https://zalo.me/0986979353",
       facebookUrl: "https://www.facebook.com/trannhuanano",
       googleBusinessUrl: "https://maps.app.goo.gl/WZ7Mh8CeyY5Frvxw6",
