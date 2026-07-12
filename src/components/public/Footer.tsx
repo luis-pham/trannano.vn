@@ -25,7 +25,7 @@ export default function Footer({ settings, locations }: FooterProps) {
     { href: "/khu-vuc", label: "Khu vực" },
     { href: "/du-an", label: "Dự án" },
     { href: "/bang-gia", label: "Bảng giá" },
-    { href: "/faq", label: "FAQ" },
+    { href: "/faq", label: "Câu hỏi thường gặp" },
     { href: "/blog", label: "Blog" },
     { href: "/lien-he", label: "Liên hệ" },
   ];
