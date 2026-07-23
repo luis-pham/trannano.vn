@@ -31,7 +31,7 @@ export default function HeroCarousel({
 
   return (
     <div
-      className="relative aspect-[4/3] w-full overflow-hidden lg:aspect-auto lg:min-h-[480px]"
+      className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-gray-200 bg-surface-muted lg:aspect-auto lg:min-h-[480px]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
