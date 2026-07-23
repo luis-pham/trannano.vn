@@ -31,16 +31,17 @@ export default function HeroCarousel({
 
   return (
     <div
-      className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-gray-200 bg-surface-muted lg:aspect-auto lg:min-h-[480px]"
+      className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-gray-200 bg-surface-muted lg:aspect-auto lg:h-[480px]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
+      {/* absolute inset-0: tránh collapse height khi dùng Image fill + translateX */}
       <div
-        className="flex h-full transition-transform duration-700 ease-out"
+        className="absolute inset-0 flex transition-transform duration-700 ease-out"
         style={{ transform: `translateX(-${index * 100}%)` }}
       >
         {slides.map((src, i) => (
-          <div key={`${src}-${i}`} className="relative h-full min-w-full shrink-0">
+          <div key={`${src}-${i}`} className="relative h-full w-full min-w-full shrink-0">
             <Image
               src={src}
               alt={i === index ? alt : ""}
