@@ -35,24 +35,23 @@ export default function HeroCarousel({
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {slides.map((src, i) => (
-        <div
-          key={`${src}-${i}`}
-          className={`absolute inset-0 transition-opacity duration-700 ease-out ${
-            i === index ? "opacity-100" : "pointer-events-none opacity-0"
-          }`}
-          aria-hidden={i !== index}
-        >
-          <Image
-            src={src}
-            alt={i === index ? alt : ""}
-            fill
-            priority={i === 0}
-            sizes="(max-width: 1024px) 100vw, 640px"
-            className="object-cover object-right"
-          />
-        </div>
-      ))}
+      <div
+        className="flex h-full transition-transform duration-700 ease-out"
+        style={{ transform: `translateX(-${index * 100}%)` }}
+      >
+        {slides.map((src, i) => (
+          <div key={`${src}-${i}`} className="relative h-full min-w-full shrink-0">
+            <Image
+              src={src}
+              alt={i === index ? alt : ""}
+              fill
+              priority={i === 0}
+              sizes="(max-width: 1024px) 100vw, 640px"
+              className="object-cover object-center"
+            />
+          </div>
+        ))}
+      </div>
 
       {slides.length > 1 && (
         <>
